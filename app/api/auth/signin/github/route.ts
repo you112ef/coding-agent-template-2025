@@ -11,8 +11,15 @@ export async function GET(req: NextRequest): Promise<Response> {
   const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID
   const redirectUri = `${req.nextUrl.origin}/api/auth/github/callback`
 
+  // If GitHub OAuth is not configured, redirect to demo mode
   if (!clientId) {
-    return Response.redirect(new URL('/?error=github_not_configured', req.url))
+    console.log('[GitHub Signin] OAuth not configured, redirecting to demo mode')
+    const demoUrl = new URL('/api/auth/github-demo', req.url)
+    const nextParam = req.nextUrl.searchParams.get('next')
+    if (nextParam) {
+      demoUrl.searchParams.set('next', nextParam)
+    }
+    return Response.redirect(demoUrl)
   }
 
   const state = generateState()
