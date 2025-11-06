@@ -25,6 +25,18 @@ export function SignIn() {
     window.location.href = '/api/auth/signin/github'
   }
 
+  const handleDemoSignIn = async () => {
+    setLoadingVercel(true)
+    try {
+      const response = await fetch('/api/auth/demo', { method: 'POST' })
+      if (response.ok) {
+        window.location.reload()
+      }
+    } catch (error) {
+      console.error('Demo sign in failed:', error)
+    }
+  }
+
   return (
     <>
       <Button onClick={() => setShowDialog(true)} variant="outline" size="sm">
@@ -127,6 +139,23 @@ export function SignIn() {
                   </>
                 )}
               </Button>
+            )}
+
+            {(process.env.NEXT_PUBLIC_DEMO_MODE === 'true' || process.env.DEMO_MODE_ALLOWED === 'true') && (
+              <div className="pt-2">
+                <Button
+                  onClick={handleDemoSignIn}
+                  disabled={loadingVercel || loadingGitHub}
+                  variant="default"
+                  size="lg"
+                  className="w-full"
+                >
+                  {loadingVercel ? 'Loading...' : 'Continue as Demo User'}
+                </Button>
+                <p className="text-xs text-center text-gray-500 mt-2">
+                  Try the app without signing in
+                </p>
+              </div>
             )}
           </div>
         </DialogContent>
